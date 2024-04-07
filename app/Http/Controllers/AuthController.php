@@ -16,10 +16,9 @@ class AuthController extends Controller
     public function signup(Request $request)
     {
         $validated = $request->validate([
-            'username' => 'sometimes|nullable|string',
             'email' => 'required|unique:users,email',
             'password' => 'required|min:8|confirmed',
-            'name' => 'sometimes|nullable|string',
+            'name' => 'sometimes|string',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -80,7 +79,6 @@ class AuthController extends Controller
                         'email' => $socialiteUser->getEmail() ?? $fakeEmail,
                     ],
                     [
-                        'username' => $fakeUsername,
                         'name' => $fakeUsername,
                         'password' => Hash::make(Str::random(24)),
                         'avatar' => null,
@@ -101,7 +99,7 @@ class AuthController extends Controller
 
             return redirect(env('FRONTEND_URL') . '/oauth/' .  '?token=' . $token);
         } catch (\Throwable $th) {
-            Log::error('OAuth callback error: ' . $th->getMessage());
+            Log::error('OAuth callback error: ' . $th);
 
             return redirect(env('FRONTEND_URL') . '/error/' . '?error=oauth_error');
         }
